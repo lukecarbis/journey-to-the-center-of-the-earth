@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plate Boundary Matching Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Source+Sans+3:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="ambient-shape shape-a" aria-hidden="true"></div>
+    <div class="ambient-shape shape-b" aria-hidden="true"></div>
+
+    <main class="game-shell">
+      <header class="title-block">
+        <p class="eyebrow">Year 8 Geography</p>
+        <h1>Plate Boundary Matching Game</h1>
+        <p class="subtitle">
+          Place each card into a cell. A card must go in the correct column, and
+          every card in a row must belong to the same boundary set.
+        </p>
+      </header>
+
+      <section class="hud" aria-label="Game controls">
+        <div class="progress-wrap">
+          <span class="progress-label">Progress</span>
+          <strong id="progress-count">0 / 25</strong>
+        </div>
+        <button id="restart-btn" type="button">Restart</button>
+      </section>
+
+      <section class="current-card-panel" aria-live="polite">
+        <h2>Current Card</h2>
+        <div id="current-card" class="current-card"></div>
+        <p id="card-hint" class="card-hint"></p>
+      </section>
+
+      <section class="table-wrap" aria-label="Matching table">
+        <table id="match-table">
+          <thead>
+            <tr>
+              <th scope="col">Boundary Type</th>
+              <th scope="col">Image</th>
+              <th scope="col">Movement</th>
+              <th scope="col">Features</th>
+              <th scope="col">Examples</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </section>
+
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+      <section id="final-overlay" class="final-overlay" aria-live="polite" hidden>
+        <div class="final-card">
+          <h2>Excellent Work!</h2>
+          <p>You completed the entire boundary table.</p>
+          <button id="play-again-btn" type="button">Play Again</button>
+        </div>
+      </section>
+
+      <div id="confetti-layer" class="confetti-layer" aria-hidden="true"></div>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
