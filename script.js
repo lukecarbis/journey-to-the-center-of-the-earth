@@ -1,20 +1,23 @@
 const TOTAL_TO_WIN = 12;
 const SKY_HEIGHT_PX = 175;
 const BASE_SCALE_PX_PER_KM = 0.23;
+const CONVECTION_ARROW_WIDTH = 40;
+const CONVECTION_ARROW_HEIGHT = 24;
+const BOTTOM_PADDING_PX = 120;
 const CHEAT_CODE = "idkfa";
 
 const EARTH_SEGMENTS = [
-  { name: "Crust", className: "crust", thicknessKm: 55 },
-  { name: "Mantle", className: "mantle mantle-zone", thicknessKm: 2835 },
+  { name: "Crust", className: "crust", thicknessKm: 110 },
+  { name: "Mantle", className: "mantle mantle-zone", thicknessKm: 2780 },
   { name: "Outer Core", className: "outer-core", thicknessKm: 2260 },
   { name: "Inner Core", className: "inner-core", thicknessKm: 1220 }
 ];
 
 const STAGE_DEPTHS_KM = [
-  55,
-  763.75,
-  1472.5,
-  2181.25,
+  110,
+  805,
+  1500,
+  2195,
   2890,
   3455,
   4020,
@@ -25,9 +28,11 @@ const STAGE_DEPTHS_KM = [
   6370
 ];
 
+
 const worldEl = document.getElementById("world");
 const viewportEl = document.getElementById("viewport");
 const drillEl = document.getElementById("drill");
+const drillHoleEl = document.getElementById("drillHole");
 const streakEl = document.getElementById("streakDisplay");
 const layerEl = document.getElementById("layerDisplay");
 const progressTrackEl = document.getElementById("progressTrack");
@@ -36,6 +41,10 @@ const quizEl = document.getElementById("quiz");
 const questionTextEl = document.getElementById("questionText");
 const feedbackEl = document.getElementById("feedback");
 const restartBtn = document.getElementById("restartBtn");
+const successOverlayEl = document.getElementById("successOverlay");
+const fireworksLayerEl = document.getElementById("fireworksLayer");
+const confettiLayerEl = document.getElementById("confettiLayer");
+const playAgainBtn = document.getElementById("playAgainBtn");
 const answerButtons = Array.from(document.querySelectorAll(".answer-btn"));
 
 let segmentModel = [];
@@ -50,6 +59,8 @@ let convectionAnimationFrame = null;
 let convectionStartTime = 0;
 let cheatIndex = 0;
 let cheatTimerId = null;
+let fireworksIntervalId = null;
+let successHideTimerId = null;
 
 const state = {
   streak: 0,
@@ -69,6 +80,141 @@ function shuffle(items) {
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
   return copy;
+}
+
+function randomBetween(min, max) {
+  return min + Math.random() * (max - min);
+}
+
+function clearCelebrationEffects() {
+  if (fireworksIntervalId !== null) {
+    clearInterval(fireworksIntervalId);
+    fireworksIntervalId = null;
+  }
+
+  if (fireworksLayerEl) {
+    fireworksLayerEl.innerHTML = "";
+  }
+
+  if (confettiLayerEl) {
+    confettiLayerEl.innerHTML = "";
+  }
+}
+
+function spawnFirework(xPct = randomBetween(12, 88), yPct = randomBetween(16, 58)) {
+  if (!fireworksLayerEl) {
+    return;
+  }
+
+  const firework = document.createElement("div");
+  firework.className = "firework";
+  firework.style.left = `${xPct}%`;
+  firework.style.top = `${yPct}%`;
+
+  const hue = randomBetween(8, 52);
+  const sparkCount = 14;
+  let longestSpark = 0;
+
+  for (let i = 0; i < sparkCount; i += 1) {
+    const spark = document.createElement("span");
+    spark.className = "firework-spark";
+    spark.style.setProperty("--angle", `${(360 / sparkCount) * i}deg`);
+    spark.style.setProperty("--spark-color", `hsl(${hue + randomBetween(-10, 36)} 96% 63%)`);
+    const sparkDuration = randomBetween(880, 1320);
+    spark.style.setProperty("--spark-duration", `${sparkDuration}ms`);
+    spark.style.setProperty("--spark-distance", `${randomBetween(34, 58)}px`);
+    firework.appendChild(spark);
+    longestSpark = Math.max(longestSpark, sparkDuration);
+  }
+
+  const flash = document.createElement("span");
+  flash.className = "firework-flash";
+  flash.style.setProperty("--spark-color", `hsl(${hue + 14} 100% 66%)`);
+  firework.appendChild(flash);
+
+  fireworksLayerEl.appendChild(firework);
+
+  setTimeout(() => {
+    firework.remove();
+  }, longestSpark + 120);
+}
+
+function createConfettiRain() {
+  if (!confettiLayerEl) {
+    return;
+  }
+
+  confettiLayerEl.innerHTML = "";
+  const confettiColors = ["#ffd84e", "#ff6e4d", "#5de0ff", "#6ef0a8", "#d98bff", "#ffffff"];
+  const pieceCount = 90;
+
+  for (let i = 0; i < pieceCount; i += 1) {
+    const piece = document.createElement("span");
+    piece.className = "confetti-piece";
+    piece.style.left = `${randomBetween(0, 100)}%`;
+    piece.style.setProperty("--confetti-color", confettiColors[Math.floor(Math.random() * confettiColors.length)]);
+    piece.style.setProperty("--fall-duration", `${randomBetween(2.6, 4.8)}s`);
+    piece.style.setProperty("--fall-delay", `${randomBetween(0, 0.9)}s`);
+    piece.style.setProperty("--confetti-drift", `${randomBetween(-90, 90)}px`);
+    piece.style.setProperty("--confetti-spin", `${randomBetween(-560, 560)}deg`);
+    confettiLayerEl.appendChild(piece);
+  }
+}
+
+function showSuccessScreen() {
+  if (!successOverlayEl) {
+    return;
+  }
+
+  if (successHideTimerId !== null) {
+    clearTimeout(successHideTimerId);
+    successHideTimerId = null;
+  }
+
+  clearCelebrationEffects();
+  createConfettiRain();
+
+  for (let i = 0; i < 4; i += 1) {
+    spawnFirework(randomBetween(18, 82), randomBetween(18, 54));
+  }
+
+  fireworksIntervalId = setInterval(() => {
+    spawnFirework();
+  }, 520);
+
+  successOverlayEl.classList.remove("hidden");
+  successOverlayEl.classList.remove("active");
+  void successOverlayEl.offsetWidth;
+  successOverlayEl.classList.add("active");
+}
+
+function hideSuccessScreen() {
+  if (!successOverlayEl) {
+    return;
+  }
+
+  if (
+    successOverlayEl.classList.contains("hidden") &&
+    !successOverlayEl.classList.contains("active")
+  ) {
+    clearCelebrationEffects();
+    return;
+  }
+
+  if (successHideTimerId !== null) {
+    clearTimeout(successHideTimerId);
+    successHideTimerId = null;
+  }
+
+  successOverlayEl.classList.remove("active");
+  clearCelebrationEffects();
+
+  successHideTimerId = setTimeout(() => {
+    if (!successOverlayEl.classList.contains("active")) {
+      successOverlayEl.classList.add("hidden");
+    }
+    successHideTimerId = null;
+  }, 340);
 }
 
 function startConvectionAnimation() {
@@ -111,7 +257,9 @@ function animateConvectionArrows(timestamp) {
     const lightness = 27 + depthRatio * 30;
     const arrowColor = `hsl(4 ${saturation}% ${lightness}%)`;
 
-    arrow.element.style.transform = `translate(${x - 10}px, ${y - 6}px) rotate(${rotationDeg}deg)`;
+    arrow.element.style.transform = `translate(${x - CONVECTION_ARROW_WIDTH / 2}px, ${
+      y - CONVECTION_ARROW_HEIGHT / 2
+    }px) rotate(${rotationDeg}deg)`;
     arrow.element.style.setProperty("--arrow-color", arrowColor);
     arrow.element.style.opacity = `${0.5 + depthRatio * 0.5}`;
   }
@@ -119,23 +267,22 @@ function animateConvectionArrows(timestamp) {
   convectionAnimationFrame = requestAnimationFrame(animateConvectionArrows);
 }
 
-function addMantleConvection(layer, className) {
+function addMantleConvection(topPx, heightPx, className) {
   const isUpperMantle = className.includes("upper-mantle");
   const overlay = document.createElement("div");
   overlay.className = `convection-overlay ${isUpperMantle ? "upper" : "deep"}`;
-  layer.appendChild(overlay);
+  overlay.style.top = `${topPx}px`;
+  overlay.style.height = `${heightPx}px`;
+  worldEl.appendChild(overlay);
 
   const cellConfig = isUpperMantle
     ? [
         { cxPct: 0.32, cyPct: 0.56, rxPct: 0.22, ryPct: 0.36 },
         { cxPct: 0.72, cyPct: 0.56, rxPct: 0.22, ryPct: 0.36 }
       ]
-    : [
-        { cxPct: 0.32, cyPct: 0.53, rxPct: 0.24, ryPct: 0.38 },
-        { cxPct: 0.68, cyPct: 0.53, rxPct: 0.24, ryPct: 0.38 }
-      ];
+    : [{ cxPct: 0.5, cyPct: 0.53, rxPct: 0.42, ryPct: 0.38 }];
 
-  const arrowsPerCell = isUpperMantle ? 4 : 5;
+  const arrowsPerCell = isUpperMantle ? 4 : 6;
   const speed = isUpperMantle ? 0.85 : 0.68;
 
   for (let cellIndex = 0; cellIndex < cellConfig.length; cellIndex += 1) {
@@ -196,40 +343,75 @@ function buildEarthModel() {
 
   totalDepthKm = kmCursor;
   totalDepthPx = pxCursor;
-  worldHeightPx = SKY_HEIGHT_PX + totalDepthPx + 120;
+  worldHeightPx = SKY_HEIGHT_PX + totalDepthPx + BOTTOM_PADDING_PX;
 }
 
-function createLayer(top, height, className, label) {
-  const layer = document.createElement("div");
-  layer.className = `layer ${className}`;
-  layer.style.top = `${top}px`;
-  layer.style.height = `${height}px`;
-
-  if (className.includes("mantle-zone")) {
-    addMantleConvection(layer, className);
-  }
-
+function createLayerLabel(label, topPx) {
   const layerLabel = document.createElement("span");
   layerLabel.className = "layer-label";
+  layerLabel.style.top = `${topPx}px`;
   layerLabel.textContent = label;
-  layer.appendChild(layerLabel);
+  worldEl.appendChild(layerLabel);
+}
+
+function createLayer(top, height, className, label, options = {}) {
+  const layer = document.createElement("div");
+  layer.className = `layer ${className}`;
+
+  if (options.circleRadiusPx > 0) {
+    const diameterPx = options.circleRadiusPx * 2;
+    layer.classList.add("layer-circle");
+    layer.style.width = `${diameterPx}px`;
+    layer.style.height = `${diameterPx}px`;
+    layer.style.left = "50%";
+    layer.style.top = `${options.circleCenterYPx - options.circleRadiusPx}px`;
+    layer.style.transform = "translateX(-50%)";
+  } else {
+    layer.style.top = `${top}px`;
+    layer.style.height = `${height}px`;
+  }
+
+  if (options.showLabel !== false) {
+    createLayerLabel(label, options.labelTopPx ?? top + 14);
+  }
 
   worldEl.appendChild(layer);
 }
 
 function renderWorld() {
-  worldEl.querySelectorAll(".layer").forEach((node) => node.remove());
+  worldEl
+    .querySelectorAll(".layer, .layer-label, .convection-overlay")
+    .forEach((node) => node.remove());
   convectionArrows = [];
 
-  createLayer(0, SKY_HEIGHT_PX, "sky", "Atmosphere");
+  createLayerLabel("Atmosphere", 20);
 
-  for (const segment of segmentModel) {
+  const earthSurfaceRadiusPx = Math.max(
+    viewportEl.clientWidth * 3.2,
+    totalDepthPx + 650
+  );
+  const earthCenterYPx = SKY_HEIGHT_PX + earthSurfaceRadiusPx;
+
+  for (let i = 0; i < segmentModel.length; i += 1) {
+    const segment = segmentModel[i];
+    const boundaryY = SKY_HEIGHT_PX + segment.startPx;
+    const labelOffsetPx = Math.max(18, Math.min(62, 18 + segment.startPx * 0.08));
+
     createLayer(
-      SKY_HEIGHT_PX + segment.startPx,
-      segment.heightPx,
+      0,
+      0,
       segment.className,
-      segment.name
+      segment.name,
+      {
+        circleRadiusPx: earthSurfaceRadiusPx - segment.startPx,
+        circleCenterYPx: earthCenterYPx,
+        labelTopPx: boundaryY + labelOffsetPx
+      }
     );
+
+    if (segment.className.includes("mantle-zone")) {
+      addMantleConvection(boundaryY, segment.heightPx, segment.className);
+    }
   }
 
   worldEl.style.height = `${worldHeightPx}px`;
@@ -290,17 +472,29 @@ function setFeedback(message, type = "") {
 
 function moveDrill(animate = true) {
   const currentDepthKm = state.streak > 0 ? STAGE_DEPTHS_KM[state.streak - 1] : 0;
-  const drillTop = SKY_HEIGHT_PX + depthKmToPx(currentDepthKm);
+  const drillDepthY = SKY_HEIGHT_PX + depthKmToPx(currentDepthKm);
 
   if (!animate) {
     drillEl.style.transition = "none";
+    if (drillHoleEl) {
+      drillHoleEl.style.transition = "none";
+    }
     worldEl.style.transition = "none";
   }
 
-  drillEl.style.top = `${drillTop}px`;
+  drillEl.style.top = `${drillDepthY}px`;
+
+  if (drillHoleEl) {
+    const holeStartY = SKY_HEIGHT_PX;
+    const drillVisualTop = drillDepthY - drillEl.offsetHeight;
+    const holeHeight = Math.max(0, drillVisualTop - holeStartY);
+    drillHoleEl.style.top = `${holeStartY}px`;
+    drillHoleEl.style.height = `${holeHeight}px`;
+    drillHoleEl.style.opacity = holeHeight > 1 ? "1" : "0";
+  }
 
   const cameraTarget = clamp(
-    drillTop - viewportEl.clientHeight * 0.34,
+    drillDepthY - viewportEl.clientHeight * 0.34,
     0,
     Math.max(0, worldHeightPx - viewportEl.clientHeight)
   );
@@ -310,6 +504,9 @@ function moveDrill(animate = true) {
   if (!animate) {
     requestAnimationFrame(() => {
       drillEl.style.transition = "";
+      if (drillHoleEl) {
+        drillHoleEl.style.transition = "";
+      }
       worldEl.style.transition = "";
     });
   }
@@ -347,6 +544,7 @@ function armCheatTimeout() {
 
 function activateCheatSkip() {
   const targetStreak = Math.min(TOTAL_TO_WIN - 2, 10);
+  hideSuccessScreen();
 
   if (state.gameOver) {
     state.gameOver = false;
@@ -394,9 +592,18 @@ function refillQuestionPool() {
 
 function renderQuestion(question) {
   questionTextEl.textContent = question.question;
-  for (const letter of ["a", "b", "c", "d"]) {
-    const button = answerButtons.find((btn) => btn.dataset.letter === letter);
-    button.querySelector(".answer-text").textContent = question.answers[letter];
+  const shuffledOptions = shuffle([
+    { sourceLetter: "a", text: question.answers.a },
+    { sourceLetter: "b", text: question.answers.b },
+    { sourceLetter: "c", text: question.answers.c },
+    { sourceLetter: "d", text: question.answers.d }
+  ]);
+
+  for (let i = 0; i < answerButtons.length; i += 1) {
+    const button = answerButtons[i];
+    const option = shuffledOptions[i];
+    button.dataset.choiceLetter = option.sourceLetter;
+    button.querySelector(".answer-text").textContent = option.text;
   }
 }
 
@@ -417,11 +624,13 @@ function onWin() {
   state.locked = false;
   setFeedback("You reached the center of Earth. 12 in a row achieved!", "win");
   setAnswersDisabled(true);
-  restartBtn.classList.remove("hidden");
+  restartBtn.classList.add("hidden");
   updateHud();
+  showSuccessScreen();
 }
 
 function onWrongAnswer(correctLetter) {
+  hideSuccessScreen();
   state.gameOver = true;
   state.locked = false;
   const correctText = state.currentQuestion.answers[correctLetter];
@@ -439,14 +648,19 @@ function submitAnswer(letter) {
     return;
   }
 
+  const chosenButton = answerButtons.find((btn) => btn.dataset.letter === letter);
+  if (!chosenButton) {
+    return;
+  }
+
   state.locked = true;
   setAnswersDisabled(true);
 
-  const chosenButton = answerButtons.find((btn) => btn.dataset.letter === letter);
   const correctLetter = state.currentQuestion.correct;
-  const correctButton = answerButtons.find((btn) => btn.dataset.letter === correctLetter);
+  const chosenChoiceLetter = chosenButton.dataset.choiceLetter;
+  const correctButton = answerButtons.find((btn) => btn.dataset.choiceLetter === correctLetter);
 
-  if (letter === correctLetter) {
+  if (chosenChoiceLetter === correctLetter) {
     chosenButton.classList.add("correct");
     state.streak += 1;
     setFeedback("Correct. The drill moves deeper.", "good");
@@ -469,6 +683,7 @@ function submitAnswer(letter) {
 }
 
 function restartGame() {
+  hideSuccessScreen();
   state.streak = 0;
   state.gameOver = false;
   state.locked = false;
@@ -596,6 +811,9 @@ function bindEvents() {
   });
 
   restartBtn.addEventListener("click", restartGame);
+  if (playAgainBtn) {
+    playAgainBtn.addEventListener("click", restartGame);
+  }
 
   window.addEventListener("keydown", (event) => {
     if (event.repeat) {

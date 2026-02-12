@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Drill to the Center</title>
+  <title>Journey to the center of the earth</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="app">
     <header class="hud">
-      <h1>Drill to the Center</h1>
+      <h1>Journey to the center of the earth</h1>
       <p class="subtitle">Answer 12 in a row to reach the center of Earth.</p>
       <div class="status-row">
         <p id="streakDisplay">Streak: 0 / 12</p>
@@ -22,8 +22,8 @@
       <div class="scene-card">
         <div id="viewport" aria-label="Earth cross section animation">
           <div id="world">
+            <div id="drillHole" aria-hidden="true"></div>
             <div id="drill" aria-hidden="true">
-              <div class="drill-top"></div>
               <div class="drill-bit">
                 <div class="drill-body"></div>
                 <div class="drill-tip"></div>
@@ -66,6 +66,28 @@
       </aside>
     </section>
   </main>
+
+  <section id="successOverlay" class="success-overlay hidden" aria-live="polite">
+    <div class="success-panel">
+      <div id="fireworksLayer" class="fireworks-layer" aria-hidden="true"></div>
+      <div id="confettiLayer" class="confetti-layer" aria-hidden="true"></div>
+
+      <div class="victory-earth-wrap" aria-hidden="true">
+        <div class="victory-earth">
+          <div class="victory-ring crust-ring"></div>
+          <div class="victory-ring mantle-ring"></div>
+          <div class="victory-ring outer-core-ring"></div>
+          <div class="victory-ring inner-core-ring"></div>
+        </div>
+      </div>
+
+      <div class="success-copy">
+        <h2>Center Reached</h2>
+        <p>12 correct in a row. You drilled all the way to Earth&apos;s center.</p>
+        <button id="playAgainBtn" class="restart">Play Again</button>
+      </div>
+    </div>
+  </section>
 
   <script src="script.js" defer></script>
 </body>
