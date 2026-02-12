@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drill to the Center</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app">
+    <header class="hud">
+      <h1>Drill to the Center</h1>
+      <p class="subtitle">Answer 12 in a row to reach the center of Earth.</p>
+      <div class="status-row">
+        <p id="streakDisplay">Streak: 0 / 12</p>
+        <p id="layerDisplay">Current Layer: Surface</p>
+      </div>
+      <div id="progressTrack" class="progress-track" aria-label="Progress to Earth center"></div>
+    </header>
+
+    <section class="game-shell">
+      <div class="scene-card">
+        <div id="viewport" aria-label="Earth cross section animation">
+          <div id="world">
+            <div id="drill" aria-hidden="true">
+              <div class="drill-top"></div>
+              <div class="drill-bit">
+                <div class="drill-body"></div>
+                <div class="drill-tip"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="quiz-card">
+        <p id="loading">Loading questions...</p>
+
+        <div id="quiz" class="hidden">
+          <p id="questionText" class="question-text"></p>
+
+          <div class="answer-grid">
+            <button class="answer-btn" data-letter="a">
+              <span class="letter">A</span>
+              <span class="answer-text"></span>
+            </button>
+            <button class="answer-btn" data-letter="b">
+              <span class="letter">B</span>
+              <span class="answer-text"></span>
+            </button>
+            <button class="answer-btn" data-letter="c">
+              <span class="letter">C</span>
+              <span class="answer-text"></span>
+            </button>
+            <button class="answer-btn" data-letter="d">
+              <span class="letter">D</span>
+              <span class="answer-text"></span>
+            </button>
+          </div>
+
+          <p class="hint">Use buttons or keyboard letters: A, B, C, D</p>
+        </div>
+
+        <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
+        <button id="restartBtn" class="restart hidden">Restart</button>
+      </aside>
+    </section>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
