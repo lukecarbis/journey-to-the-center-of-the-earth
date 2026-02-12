@@ -224,8 +224,29 @@ button {
 
 #match-table {
   border-collapse: collapse;
-  width: 100%;
-  min-width: 930px;
+  table-layout: fixed;
+  width: 1290px;
+  min-width: 1290px;
+}
+
+#match-table .col-boundary-type {
+  width: 120px;
+}
+
+#match-table .col-image {
+  width: 230px;
+}
+
+#match-table .col-movement {
+  width: 260px;
+}
+
+#match-table .col-features {
+  width: 420px;
+}
+
+#match-table .col-examples {
+  width: 260px;
 }
 
 th,

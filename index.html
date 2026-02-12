@@ -59,6 +59,7 @@
     }
 
     .card {
+      display: block;
       background: var(--card);
       border: 2px solid var(--sand);
       border-radius: 16px;
@@ -66,10 +67,12 @@
       box-shadow: 0 10px 25px var(--shadow);
       transform: translateY(0);
       transition: transform 170ms ease, box-shadow 170ms ease, border-color 170ms ease;
+      color: inherit;
+      text-decoration: none;
     }
 
     .card:hover,
-    .card:focus-within {
+    .card:focus-visible {
       transform: translateY(-6px);
       border-color: var(--accent);
       box-shadow: 0 16px 28px rgba(17, 33, 28, 0.28);
@@ -118,21 +121,21 @@
     <p class="subtitle">Choose a game to start playing.</p>
 
     <section class="games" aria-label="Available games">
-      <article class="card">
-        <img class="thumb" src="images/journey-to-the-center-of-the-earth.png" alt="Preview of Journey to the Center of the Earth game">
-        <div class="content">
-          <h2>Journey to the Center of the Earth</h2>
-          <a class="play-link" href="journey-to-the-center-of-the-earth/">Play Game</a>
-        </div>
-      </article>
-
-      <article class="card">
+      <a class="card" href="boundary-matching/">
         <img class="thumb" src="images/boundary-matching.png" alt="Preview of Boundary Matching game">
         <div class="content">
           <h2>Boundary Matching</h2>
-          <a class="play-link" href="boundary-matching/">Play Game</a>
+          <span class="play-link">Play Game</span>
         </div>
-      </article>
+      </a>
+
+      <a class="card" href="journey-to-the-center-of-the-earth/">
+        <img class="thumb" src="images/journey-to-the-center-of-the-earth.png" alt="Preview of Journey to the Center of the Earth game">
+        <div class="content">
+          <h2>Journey to the Center of the Earth</h2>
+          <span class="play-link">Play Game</span>
+        </div>
+      </a>
     </section>
   </main>
 </body>
