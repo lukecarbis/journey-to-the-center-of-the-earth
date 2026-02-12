@@ -1,94 +1,139 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Journey to the center of the earth</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Geography Games Hub</title>
+  <style>
+    :root {
+      --paper: #f3efe3;
+      --ink: #18221f;
+      --accent: #2f6f64;
+      --accent-strong: #1e4f47;
+      --sand: #d9c9a7;
+      --card: #fbf8f0;
+      --shadow: rgba(14, 20, 18, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Trebuchet MS", "Gill Sans", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 10%, #fbf6e6 0%, rgba(251, 246, 230, 0) 34%),
+        radial-gradient(circle at 90% 20%, #dbe9e6 0%, rgba(219, 233, 230, 0) 32%),
+        linear-gradient(120deg, var(--paper), #e9e1cf);
+      display: grid;
+      place-items: center;
+      padding: 2rem 1rem;
+    }
+
+    .wrapper {
+      width: min(1100px, 100%);
+    }
+
+    h1 {
+      margin: 0 0 0.5rem;
+      font-family: "Georgia", "Palatino Linotype", serif;
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      letter-spacing: 0.04em;
+      text-align: center;
+    }
+
+    .subtitle {
+      margin: 0 0 2rem;
+      text-align: center;
+      font-size: clamp(1rem, 1.6vw, 1.2rem);
+      color: #2f3f3a;
+    }
+
+    .games {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 2px solid var(--sand);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px var(--shadow);
+      transform: translateY(0);
+      transition: transform 170ms ease, box-shadow 170ms ease, border-color 170ms ease;
+    }
+
+    .card:hover,
+    .card:focus-within {
+      transform: translateY(-6px);
+      border-color: var(--accent);
+      box-shadow: 0 16px 28px rgba(17, 33, 28, 0.28);
+    }
+
+    .thumb {
+      aspect-ratio: 16 / 9;
+      width: 100%;
+      object-fit: cover;
+      display: block;
+      border-bottom: 2px solid var(--sand);
+    }
+
+    .content {
+      padding: 1rem 1rem 1.2rem;
+    }
+
+    h2 {
+      margin: 0 0 0.5rem;
+      font-family: "Georgia", "Palatino Linotype", serif;
+      font-size: 1.35rem;
+    }
+
+    .play-link {
+      display: inline-block;
+      margin-top: 0.4rem;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 0.55rem 1rem;
+      letter-spacing: 0.02em;
+      transition: background-color 160ms ease;
+    }
+
+    .play-link:hover,
+    .play-link:focus-visible {
+      background: var(--accent-strong);
+    }
+  </style>
 </head>
 <body>
-  <main class="app">
-    <header class="hud">
-      <h1>Journey to the center of the earth</h1>
-      <p class="subtitle">Answer 12 in a row to reach the center of Earth.</p>
-      <div class="status-row">
-        <p id="streakDisplay">Streak: 0 / 12</p>
-        <p id="layerDisplay">Current Layer: Surface</p>
-      </div>
-      <div id="progressTrack" class="progress-track" aria-label="Progress to Earth center"></div>
-    </header>
+  <main class="wrapper">
+    <h1>Geography Game Selector</h1>
+    <p class="subtitle">Choose a game to start playing.</p>
 
-    <section class="game-shell">
-      <div class="scene-card">
-        <div id="viewport" aria-label="Earth cross section animation">
-          <div id="world">
-            <div id="drillHole" aria-hidden="true"></div>
-            <div id="drill" aria-hidden="true">
-              <div class="drill-bit">
-                <div class="drill-body"></div>
-                <div class="drill-tip"></div>
-              </div>
-            </div>
-          </div>
+    <section class="games" aria-label="Available games">
+      <article class="card">
+        <img class="thumb" src="images/journey-to-the-center-of-the-earth.png" alt="Preview of Journey to the Center of the Earth game">
+        <div class="content">
+          <h2>Journey to the Center of the Earth</h2>
+          <a class="play-link" href="journey-to-the-center-of-the-earth/">Play Game</a>
         </div>
-      </div>
+      </article>
 
-      <aside class="quiz-card">
-        <p id="loading">Loading questions...</p>
-
-        <div id="quiz" class="hidden">
-          <p id="questionText" class="question-text"></p>
-
-          <div class="answer-grid">
-            <button class="answer-btn" data-letter="a">
-              <span class="letter">A</span>
-              <span class="answer-text"></span>
-            </button>
-            <button class="answer-btn" data-letter="b">
-              <span class="letter">B</span>
-              <span class="answer-text"></span>
-            </button>
-            <button class="answer-btn" data-letter="c">
-              <span class="letter">C</span>
-              <span class="answer-text"></span>
-            </button>
-            <button class="answer-btn" data-letter="d">
-              <span class="letter">D</span>
-              <span class="answer-text"></span>
-            </button>
-          </div>
-
-          <p class="hint">Use buttons or keyboard letters: A, B, C, D</p>
+      <article class="card">
+        <img class="thumb" src="images/boundary-matching.png" alt="Preview of Boundary Matching game">
+        <div class="content">
+          <h2>Boundary Matching</h2>
+          <a class="play-link" href="boundary-matching/">Play Game</a>
         </div>
-
-        <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
-        <button id="restartBtn" class="restart hidden">Restart</button>
-      </aside>
+      </article>
     </section>
   </main>
-
-  <section id="successOverlay" class="success-overlay hidden" aria-live="polite">
-    <div class="success-panel">
-      <div id="fireworksLayer" class="fireworks-layer" aria-hidden="true"></div>
-      <div id="confettiLayer" class="confetti-layer" aria-hidden="true"></div>
-
-      <div class="victory-earth-wrap" aria-hidden="true">
-        <div class="victory-earth">
-          <div class="victory-ring crust-ring"></div>
-          <div class="victory-ring mantle-ring"></div>
-          <div class="victory-ring outer-core-ring"></div>
-          <div class="victory-ring inner-core-ring"></div>
-        </div>
-      </div>
-
-      <div class="success-copy">
-        <h2>Center Reached</h2>
-        <p>12 correct in a row. You drilled all the way to Earth&apos;s center.</p>
-        <button id="playAgainBtn" class="restart">Play Again</button>
-      </div>
-    </div>
-  </section>
-
-  <script src="script.js" defer></script>
 </body>
 </html>
